@@ -1,0 +1,74 @@
+use AdventureWorks2012
+go
+use [AdventureWorks2012] EXEC sp_changedbowner 'sa'
+ALTER AUTHORIZATION ON DATABASE::AdventureWorks2012 TO sa;
+
+-- 1 --
+Go
+Select pl.Name "Location Name", pl.CostRate "Cost Rate"
+From Production.Location pl;
+Go
+
+-- 2 --
+Go
+Select *
+From Sales.SalesTaxRate ss
+Where (ss.Name like '%Canadian GST%') and (ss.TaxType = 2);
+Go
+
+-- 3 --
+Go
+Select sc.CustomerID "Customer ID", sc.AccountNumber "Account Number", sc.TerritoryID "Territory ID", ss.Name "Store Name"
+From Sales.Customer sc
+Join Sales.Store ss on sc.CustomerID=ss.BusinessEntityID
+Where ((sc.TerritoryID = 2) 
+Or (sc.TerritoryID = 3) 
+Or (sc.TerritoryID = 5))
+And ss.Name like '%Bike%'
+Order by ss.Name desc, sc.CustomerID asc
+Go
+
+-- 4 --
+Go
+Select JobTitle "Job Title",
+Count(*) "Number of Employees",
+Avg(SickLeaveHours) "Avarage Sick Hours"
+From HumanResources.Employee
+Group by JobTitle
+Order by avg(SickLeaveHours) desc
+Go
+
+-- 5 --
+Go
+Select he.NationalIDNumber "National ID", 
+concat(pp.FirstName, ' ', pp.LastName, ' ', pp.MiddleName) "Full Name", 
+he.SickLeaveHours "Sick Leave Hours", 
+(select Avg(SickLeaveHours) from HumanResources.Employee) "Avarage Sick Leave Hours"
+From HumanResources.Employee he
+Join Person.Person pp on he.BusinessEntityID=pp.BusinessEntityID
+Where HireDate > '2010-01-01' and he.SickLeaveHours > (select Avg(SickLeaveHours) from HumanResources.Employee)
+Order by concat(pp.FirstName, ' ', pp.LastName, ' ', pp.MiddleName) asc
+Go
+
+-- 6 --
+Go
+Create view Task2 as
+Select *
+From Sales.SalesTaxRate ss
+Where (ss.Name like '%Canadian GST%') and (ss.TaxType = 2);
+ /* View is updatable because it consist of one able only. It doesn't have any kind of aggregate functions
+ (ex. Sum(), Datediff() etc.) or any distinct clause/ group by. None of subqueries are defined in his view. */
+Go
+
+-- 7 --
+Go
+Select he.NationalIDNumber "National ID", he.JobTitle "Job Title", pp.FirstName "First Name", 
+pp.LastName "Last Name", hd.Name "Department Name", Datepart(WEEKDAY, hedh.StartDate) "Department Start Week Day"
+From HumanResources.Employee he
+Join Person.Person pp on he.BusinessEntityID=pp.BusinessEntityID
+Left Join Sales.SalesPerson ss on he.BusinessEntityID=ss.BusinessEntityID
+Join HumanResources.EmployeeDepartmentHistory hedh on he.BusinessEntityID=hedh.BusinessEntityID
+Join HumanResources.Department hd on hedh.DepartmentID=hd.DepartmentID
+Where (hd.Name not like '%Sales%') and (Datepart(WEEKDAY, StartDate) = 3 or Datepart(WEEKDAY, StartDate) = 5)
+Order by hd.Name
+Go

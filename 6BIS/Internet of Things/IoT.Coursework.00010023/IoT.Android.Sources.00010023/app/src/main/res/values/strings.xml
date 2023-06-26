@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">ArduinoConnect</string>
+    <string name="connect">Connect</string>
+    <string name="water">Water</string>
+    <string name="the_air">The air</string>
+    <string name="active">Active</string>
+    <string name="on">On</string>
+    <string name="humidity">Humidity</string>
+    <string name="soilmoisture">Soilmoisture</string>
+    <string name="temperature">Temperature</string>
+    <string name="auto">Auto</string>
+    <string name="ons">On</string>
+    <string name="off">Off</string>
+    <string name="soil_moisture">Soil Moisture</string>
+</resources>
